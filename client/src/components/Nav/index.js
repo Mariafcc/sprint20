@@ -1,13 +1,18 @@
-import React from "react";
+import React, { Component } from "react";
 
-function Nav() {
-  return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a className="navbar-brand" href="/">
-        React Reading List
+class Nav extends Component {
+  state = {
+    open: false
+  };
+  render() {
+    return (
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a className="navbar-brand" href="/">
+          React Reading List
       </a>
-    </nav>
-  );
+      </nav>
+    );
+  }
 }
 
 export default Nav;

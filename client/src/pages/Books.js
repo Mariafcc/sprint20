@@ -1,69 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Component } from "react";
 import Jumbotron from "../components/Jumbotron";
 import DeleteBtn from "../components/DeleteBtn";
 import API from "../utils/API";
 import { Col, Row, Container } from "../components/Grid";
 import { List, ListItem } from "../components/List";
-import { Input, TextArea, FormBtn } from "../components/Form";
+import Form from "../components/Form";
+import e from "express";
 
-function Books() {
-  // Setting our component's initial state
-  const [books, setBooks] = useState([])
-  const [formObject, setFormObject] = useState({})
 
-  // Load all books and store them with setBooks
-  useEffect(() => {
-    loadBooks()
-  }, [])
+class Books extends Component {
+  state = {
+    books: [],
+    q: ""
+  }
 
   // Loads all books and sets them to books
-  function loadBooks() {
-    API.getBooks(books.q)
-      .then(res => 
-        setBooks(res.data)
+  loadBooks = () => {
+    API.getBooks(this.state.q)
+      .then(res =>
+        this.setState({
+          books: res.data
+        })
       )
-      .catch(err => console.log(err));
+      .catch(() => this.setState({
+        books: [],
+      }));
   };
+
+  handleInputChange = event => {
+    const { name, value } = event.target
+    this.setState({
+      [name]: value
+    })
+  }
+
+  handleFormSubmit = event => {
+    event.preventDefault();
+    this.loadBooks();
+  }
+
+  savedBooks = id => {
+    const book = this.state.books.find(data => data.id === id)
+    API.saveBook({
+      googleId: book.id,
+      title: book.volumeInfo.title,
+      subtitle: book.volumeInfo.subtitle,
+      link: book.volumeInfo.infoLink,
+      authors: book.volumeInfo.authors,
+      description: book.volumeInfo.description,
+      image: book.volumeInfo.imageLinks.thumbnail
+    })
+      .then(() =>
+        this.loadBooks())
+  }
+
+  render() {
 
 
     return (
+
       <Container fluid>
         <Row>
-          <Col size="md-6">
+          <Col size="md-12">
             <Jumbotron>
-              <h1>What Books Should I Read?</h1>
+              <h1>React book search?</h1>
             </Jumbotron>
-            <form>
-              <Input
-                onChange={() => {}}
-                name="title"
-                placeholder="Title (required)"
-              />
-              <Input
-                onChange={() => {}}
-                name="author"
-                placeholder="Author (required)"
-              />
-              <TextArea
-                onChange={() => {}}
-                name="synopsis"
-                placeholder="Synopsis (Optional)"
-              />
-              <FormBtn
-                disabled={!(formObject.author && formObject.title)}
-                onClick={() => {}}
-              >
-                Submit Book
-              </FormBtn>
-            </form>
+            <Form
+            handleInputChange = {this.handleInputChange}
+            handleFormSubmit = {this.handleFormSubmit}
+            q = {this.state.q}
+            />
+
           </Col>
           <Col size="md-6 sm-12">
             <Jumbotron>
               <h1>Books On My List</h1>
             </Jumbotron>
-            {books.length ? (
+            {this.state.books.length ? (
               <List>
-                {books.map(book => {
+                {this.state.books.map(book => {
                   return (
                     <ListItem key={book._id}>
                       <a href={"/books/" + book._id}>
@@ -71,19 +86,20 @@ function Books() {
                           {book.title} by {book.author}
                         </strong>
                       </a>
-                      <DeleteBtn onClick={() =>{}} />
+                      <DeleteBtn onClick={() => { }} />
                     </ListItem>
                   );
                 })}
               </List>
             ) : (
-              <h3>No Results to Display</h3>
-            )}
+                <h3>No Results to Display</h3>
+              )}
           </Col>
         </Row>
       </Container>
-    );
+    )
   }
+}
 
 
 export default Books;

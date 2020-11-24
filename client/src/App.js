@@ -3,7 +3,7 @@ import Books from "./pages/Books";
 import Nav from "./components/Nav";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NoMatch from "./pages/NoMatch";
-import Detail from "./pages/Detail";
+import Saved from "./pages/saved";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Nav />
         <Switch>
           <Route exact path="/" component={Books} />
-          <Route exact path="/detail" component={Detail} />
+          <Route exact path="/saved" component={Saved} />
           <Route component={NoMatch} />
         </Switch>
       </div>

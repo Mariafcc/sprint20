@@ -1,22 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Component } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Col, Row, Container } from "../components/Grid";
 import Jumbotron from "../components/Jumbotron";
 import API from "../utils/API";
 
-function Detail(props) {
-  const [book, setBook] = useState({})
+class Saved extends Component {
+  state = {
+    books: [],
+  }
 
-  // When this component mounts, grab the book with the _id of props.match.params.id
-  // e.g. localhost:3000/books/599dcb67f0f16317844583fc
-  const {id} = useParams()
-  useEffect(() => {
-    API.getSavedBook(id)
-      .then(res => setBook(res.data))
+
+  savedBooks = () => {
+    API.getSavedBook()
+      .then(res => this.setState({ books: res.data }))
       .catch(err => console.log(err));
-  }, [])
 
-  return (
+  }
+
+  deleteBook = id => {
+    API.deleteBook(id)
+      .then(() => this.savedBooks())
+  }
+
+  componentDidMount() {
+    this.savedBooks()
+  }
+  render() {
+    return (
       <Container fluid>
         <Row>
           <Col size="md-12">
@@ -42,9 +52,10 @@ function Detail(props) {
             <Link to="/">← Back to Authors</Link>
           </Col>
         </Row>
-      </Container>
-    );
+      </Container >
+    )
   }
+}
 
 
 export default Detail;
